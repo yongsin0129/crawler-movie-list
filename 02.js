@@ -8,8 +8,9 @@ const fs = require('fs')
     // 使用自訂的 Chrome
     executablePath:
       'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe',
-    headless: true, //false 會讓瀏覽器實際開啟  //true 會再後台開啟
-    slowMo: 100
+    headless: false, //false 會讓瀏覽器實際開啟  //true 會再後台開啟
+    slowMo: 100,
+    devtools: true
   }
 
   const browser = await puppeteer.launch(config)
@@ -47,6 +48,7 @@ const fs = require('fs')
   *
   *********************************************************************************/
   let movieListsDOM = await page.$$eval('.filmList', lists => {
+    debugger
 
     let _array = []
 
@@ -58,7 +60,7 @@ const fs = require('fs')
         imgLink
       })
     })
-    
+
     return _array
 
   })
