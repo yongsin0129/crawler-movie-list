@@ -11,6 +11,6 @@
   "license": "ISC",
   "dependencies": {
     "axios": "^0.27.2",
-    "puppeteer": "^2.1.1"
+    "puppeteer": "^18.0.5"
   }
 }
