@@ -32,11 +32,11 @@ async function getHTML () {
         .find('a img')
         .attr('src')
 
-      const moiveDescription = $(el)
+      const movieDescription = $(el)
         .find('p')
         .text()
 
-      movieList.push({ movieTile, movieImage, moiveDescription })
+      movieList.push({ movieTile, movieImage, movieDescription: movieDescription })
     })
 
     console.log(movieList)

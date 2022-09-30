@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "incremental": true, // 啟用增量編譯
+    "target": "ES2017", // 編譯成指定的 JavaScript 版本
+    "module": "es6", // 指定編譯成何種模組
+    "lib": ["ES6", "DOM"], // 呼叫需要引入的 lib , 但 vscode 不引入也能有提示
+    "declaration": true, // 產生 '.d.ts' 檔
+    "sourceMap": true, // 產生 '.map' 檔
+    "outDir": "./dist", // 指定編譯後的檔案存放點
+    "rootDir": "./", // 載入點的位置
+    "removeComments": true, // 移除註解
+    "strict": true, // 採用嚴格模式 strict 開頭的總開關
+    "baseUrl": "./src", // 指定匯入檔案的基準路徑
+    "esModuleInterop": true, // 兼容模組
+    "experimentalDecorators": true, // 啟用裝飾器
+    "emitDecoratorMetadata": true, // 提供裝飾器 metadata
+    "allowJs": false, // 是否对js文件编译
+    "checkJs": false, // 是否对js文件进行检查
+    "noEmitOnError": true, //有错误的情况下不进行编译
+    "noImplicitAny": true, //禁止隐式的any类型
+    "noImplicitThis": true // 禁止类型不明确的this
+    // "strictBindCallApply": false, //严格检查bind、call和apply的参数列表
+    // "strictFunctionTypes": true, // 严格检查函数的类型
+    // "strictNullChecks": true, // 严格的空值检查
+    // "strictPropertyInitialization": true // 严格检查属性是否初始化
+  },
+  "include": ["./**/*.ts"], // 納入編譯範圍
+  "exclude": ["node_modules", "dist"] //不納入編譯範圍
+}

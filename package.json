@@ -5,11 +5,15 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon 02.js"
+    "dev": "nodemon 02.js",
+    "tsc": "npm run build && node ./dist/puppeteer_03_canNews",
+    "build": "tsc"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@types/cheerio": "^0.22.31",
+    "@types/puppeteer": "^5.4.6",
     "axios": "^0.27.2",
     "cheerio": "^1.0.0-rc.12",
     "puppeteer": "^18.0.5"
