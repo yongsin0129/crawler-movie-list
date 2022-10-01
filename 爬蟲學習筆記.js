@@ -42,8 +42,10 @@ const config = {
   executablePath: 'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe',
   //false 會讓瀏覽器實際開啟  //true 會再後台開啟
   headless: false,
-  // 慢動作
-  slowMo: 100,
+  // 慢動作 設定成 100 在 chrome 的 dev 中看不到 script , 用 250 才能看到
+  slowMo: 250,
+  // 設定 browser size
+  args: [`--window-size=1920,1080`],
   // 打開 dev
   devtools: true
 }
