@@ -1,18 +1,20 @@
 import { Category } from './class'
+import { Page } from 'puppeteer'
 const puppeteer = require('puppeteer')
 const cheerio = require('cheerio')
 
-/********************************************************************************
+  /********************************************************************************
 *
           主程式
 *
 *********************************************************************************/
 ;(async () => {
   const browser = await puppeteer.launch({
-    headless: false
+    headless: false,
+    devtools: true
   })
 
-  const page = await browser.newPage()
+  const page: Page = await browser.newPage()
 
   await page.goto('https://www.cna.com.tw/')
   await page.waitForSelector('footer')
@@ -49,7 +51,7 @@ async function getCategory (body: string): Promise<Array<Category>> {
   return data
 }
 
-async function getCategorySubPost (data: Array<Category>, page: any) {
+async function getCategorySubPost (data: Array<Category>, page: Page) {
   // 跳過 0 , 因為 0 是'疫情'頁面，content 的 html 邏輯跟大家不一樣
   // dev mode data.length 先用 2 取代
   for (let index = 1; index < data.length; index++) {
@@ -72,6 +74,8 @@ async function getCategorySubPost (data: Array<Category>, page: any) {
           console.log(`點擊 ${element.name} 一次`)
         }
       } catch (error) {
+        const list = await evaluateTest(page)
+        console.log('getCategorySubPost ~ list', list)
         let body: string = await page.content()
         await getPostContent(body, element.name)
         end = false
@@ -131,5 +135,44 @@ async function autoScroll (page: any) {
         }
       }, 100)
     })
+  })
+}
+
+async function evaluateTest (page: Page) {
+  return page.evaluate(() => {
+    let _array: Object[] = []
+    let _array2: Object[] = []
+
+    // debugger
+    
+    /********************************************************************************
+    *
+              node_list 才有 forEach , HTMLCollection 沒有
+
+              註 執行迴圈時 ，item 類型為 Element 時，才有 querySelector 方法，如果是
+              child_node 類型就不會有些方法。
+
+              結論，要做迴圈整理時，要用 node_list !!不要用 htmlCollection or htmlElement.children 
+    *
+    *********************************************************************************/
+    const mainList = document.querySelectorAll('#jsMainList > li')
+    mainList.forEach(item => {
+      const href = item.querySelector('a')?.href
+      const title = item.querySelector('div.listInfo h2 span')?.innerHTML
+      _array.push({ href, title })
+    })
+    /********************************************************************************
+    *
+              將 node_list 丟入 array.from 使用
+    *
+    *********************************************************************************/
+    // const mainList2 = Array.from(document.querySelectorAll('#jsMainList > li'))
+    // mainList2.forEach(item => {
+    //   const href = item.querySelector('a')?.href
+    //   const title = item.querySelector('div.listInfo h2 span')?.innerHTML
+    //   _array2.push({ href, title })
+    // })
+
+    return _array
   })
 }
