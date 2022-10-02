@@ -11,6 +11,8 @@ const cheerio = require('cheerio')
 ;(async () => {
   const browser = await puppeteer.launch({
     headless: false,
+    slowMo: 250,
+    args: [`--window-size=1920,1080`],
     devtools: true
   })
 
@@ -74,10 +76,16 @@ async function getCategorySubPost (data: Array<Category>, page: Page) {
           console.log(`點擊 ${element.name} 一次`)
         }
       } catch (error) {
-        const list = await evaluateTest(page)
-        console.log('getCategorySubPost ~ list', list)
+        // 這邊有兩種處理法
+        // 第一種，使用 puppeteer page.content() 爬取頁面全部資料，丟入 cheerio 處理
         let body: string = await page.content()
         await getPostContent(body, element.name)
+
+        // 第二種，使用 puppeteer 的 eval 方法，進入 browser 內用 vanilla 的 dom 操作
+        const list = await evaluateTest(page)
+        console.log('getCategorySubPost ~ list', list)
+
+        // 停止 while loop
         end = false
       }
     }
@@ -91,19 +99,24 @@ async function getPostContent (body: any, categoryName: string) {
   const getHtml = await $('#jsMainList li').text()
 
   await $('#jsMainList li').each((i: number, el: any) => {
-    const title = $(el)
+    const title: string = $(el)
       .find('div.listInfo h2 span')
       .text()
 
-    const href = $(el)
+    const href: string = $(el)
       .find('a')
       .attr('href')
 
-    const date = $(el)
+    const date: string = $(el)
       .find('div.date')
       .text()
 
-    postContent.push({ title, href, date })
+    // 過濾廣告 : 檢查 href ，帶有 ww.cna 開頭的才是真正的新聞
+    const isNotAdvertisement = href.toLowerCase().includes('www.cna')
+
+    if (isNotAdvertisement) {
+      postContent.push({ title, href, date })
+    }
   })
   saveToFile(postContent, categoryName)
 }
@@ -144,7 +157,7 @@ async function evaluateTest (page: Page) {
     let _array2: Object[] = []
 
     // debugger
-    
+
     /********************************************************************************
     *
               node_list 才有 forEach , HTMLCollection 沒有
@@ -159,7 +172,8 @@ async function evaluateTest (page: Page) {
     mainList.forEach(item => {
       const href = item.querySelector('a')?.href
       const title = item.querySelector('div.listInfo h2 span')?.innerHTML
-      _array.push({ href, title })
+      const date = item.querySelector('div.date')?.innerHTML
+      _array.push({ href, title, date })
     })
     /********************************************************************************
     *
