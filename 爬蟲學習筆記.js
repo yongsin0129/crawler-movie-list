@@ -29,6 +29,22 @@ $('CSS Selector')
 // 2. 對已經存在的 DOM 操作 , 記得不用在 字串符號 ！！ (時常忘記就加上了　！！！)
 $(dom)
 
+/*
+  step1 : 
+  $()選擇者不分 querySelector or SelectorAll 
+  所以選擇完 可用 $().html() , .text() , length 確認選到的 dom
+
+  step2 :
+  如果 length 為 1 ，其他內容都在 dom 下一層，可用 children() 
+
+  如果是 length 為 n 的 arrayLike ，可直接用 each((i,el)=>{ foo })
+
+  實用方法 :
+  $().find('selector'):DOM
+  $().hasClass('class'):boolean
+  DOM.attr('') 取得屬性
+*/
+
 /********************************************************************************
 *
           puppeteer 
