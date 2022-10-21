@@ -1,7 +1,9 @@
 import { Category } from './class'
 import { Page } from 'puppeteer'
-const puppeteer = require('puppeteer')
-const cheerio = require('cheerio')
+// const puppeteer = require('puppeteer') 無法讀到 type
+import puppeteer from 'puppeteer'
+// const cheerio = require('cheerio') 無法讀到 type
+import cheerio from 'cheerio'
 
   /********************************************************************************
 *
@@ -38,14 +40,14 @@ async function getCategory (body: string): Promise<Array<Category>> {
   let data: Array<Category> = []
   // 先將主要 menu 抓出來，再用 each 整理
 
-  await $('ul.main-menu > li').each((i: number, el: any) => {
+  await $('ul.main-menu > li').each((i: number, el) => {
     //抓取類別，這裡其實抓的到子類別的名子和網址。但我們先把他忽略
     let name: string = $(el)
       .find('a.first-level')
       .text()
     let href: string = $(el)
       .find('a.first-level')
-      .attr('href')
+      .attr('href') as string
     if (name === '' && href === undefined) return
     let tmp = new Category(name, href)
     data.push(tmp)
@@ -105,7 +107,7 @@ async function getPostContent (body: any, categoryName: string) {
 
     const href: string = $(el)
       .find('a')
-      .attr('href')
+      .attr('href') as string
 
     const date: string = $(el)
       .find('div.date')

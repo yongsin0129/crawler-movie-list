@@ -23,9 +23,9 @@ async function main () {
   const $ = cheerio.load(response.data)
 
   // table 的欄位名稱
-  const columnName: string[] = []
+  const columnName: string[] = [] // Array<string>
   // table 的內容 ， 用一個 array 包住所有幣別資料，每一種幣別資料都用一個 array 包住
-  const columnContent: string[][] = []
+  const columnContent: string[][] = [] // Array<Array<string>>
 
   $('table tbody tr').each((i: number, el: cheerio.Element) => {
     // $().each 為一個 長度 20 的 arrayLike
