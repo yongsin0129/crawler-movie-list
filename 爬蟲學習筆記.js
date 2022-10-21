@@ -2,6 +2,10 @@ const axios = require('axios').default
 const cheerio = require('cheerio')
 const puppeteer = require('puppeteer')
 
+// const cheerio = require('cheerio') 原寫法讀不到 type
+// 注意 不使用 es6 的 import 無法自動帶出type - $: cheerio.Root
+// 實驗 : 在 js 下用 require 可以讀到 type , 在 ts 下需用 import
+
 /********************************************************************************
 *
           axios 
@@ -74,7 +78,7 @@ await page.waitForSelector('footer') // 可以觀察此網站最後的元素，�
 // 加載完畢後，有多種方式可爬資料
 // 1. 使用 cheerio
 let body = await page.content()
-const $ = await cheerio.load(body)
+$ = await cheerio.load(body)
 
 // 2. 使用　puppeteer 的　evaluate 方法，這種方法會在 browser 端將程式碼帶入後再 return 回來
 page.evaluate(()=>{

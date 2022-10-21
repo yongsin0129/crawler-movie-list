@@ -1,5 +1,8 @@
 const axios = require('axios').default
-const cheerio = require('cheerio')
+import cheerio from 'cheerio'
+// const cheerio = require('cheerio') 原寫法讀不到 type
+// 注意 不使用 es6 的 import 無法自動帶出type - $: cheerio.Root
+// 實驗 : 在 js 下用 require 可以讀到 type , 在 ts 下需用 import 
 /********************************************************************************
 *
           基礎參數
@@ -24,24 +27,24 @@ async function main () {
   // table 的內容 ， 用一個 array 包住所有幣別資料，每一種幣別資料都用一個 array 包住
   const columnContent: string[][] = []
 
-  $('table tbody tr').each((i: number, el: any) => {
-    // $().each 為一個 長度 20 的 arrayLike 
+  $('table tbody tr').each((i: number, el: cheerio.Element) => {
+    // $().each 為一個 長度 20 的 arrayLike
 
     // i = 0 表示 table 第一行，欄位名稱
     if (i === 0) {
       $(el)
         .find('th')
-        .each((i: number, el: any) => {
+        .each((i: number, el: cheerio.Element) => {
           columnName.push($(el).text())
         })
-    } 
+    }
     // i /= 0 為幣種匯率資料
     else {
       const tempArray: string[] = []
       // $(el).find('td) 是一個長度為 5 的 arrayLike
       $(el)
         .find('td')
-        .each((i: number, el: any) => {
+        .each((i: number, el: cheerio.Element) => {
           // class =flag 為幣種名稱
           if ($(el).hasClass('flag')) {
             tempArray.push(
@@ -49,7 +52,7 @@ async function main () {
                 .find('a')
                 .text()
             )
-          } 
+          }
           // class = bank 為匯率最佳銀行
           else if ($(el).hasClass('bank')) {
             tempArray.push(
@@ -57,7 +60,7 @@ async function main () {
                 .find('a')
                 .text()
             )
-          } 
+          }
           // 其他沒有分類是分別是 : '現金買入', '現金賣出', '更新時間'
           else {
             tempArray.push($(el).text())
