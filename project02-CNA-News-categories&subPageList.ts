@@ -5,7 +5,7 @@ import puppeteer from 'puppeteer'
 // const cheerio = require('cheerio') 無法讀到 type
 import cheerio from 'cheerio'
 
-  /********************************************************************************
+/********************************************************************************
 *
           主程式
 *
@@ -19,12 +19,16 @@ import cheerio from 'cheerio'
   })
 
   const page: Page = await browser.newPage()
+  console.log('成功啟動系統，開始進入網站...')
 
   await page.goto('https://www.cna.com.tw/')
   await page.waitForSelector('footer')
+  console.log('成功進入網站，開始進行搜尋新聞分類...')
+
   let body: string = await page.content()
   let data: Array<Category> = await getCategory(body)
   saveToFile(data, '分類')
+  console.log('成功搜尋新聞分類，開始進行各分類新聞收集...')
   await getCategorySubPost(data, page)
 
   await browser.close()
@@ -56,8 +60,8 @@ async function getCategory (body: string): Promise<Array<Category>> {
 }
 
 async function getCategorySubPost (data: Array<Category>, page: Page) {
-  // 跳過 0 , 因為 0 是'疫情'頁面，content 的 html 邏輯跟大家不一樣
-  // dev mode data.length 先用 2 取代
+  // 跳過 0 , 因為 0 是最新主題的頁面，content 的 html 邏輯跟大家不一樣
+  // 如果是在 dev mode : data.length 會先用 2 取代
   for (let index = 1; index < data.length; index++) {
     const element = data[index]
     await page.goto(element.href)
@@ -66,11 +70,11 @@ async function getCategorySubPost (data: Array<Category>, page: Page) {
     let end = true
     while (end) {
       await autoScroll(page)
-      //等待幾秒不要一次抓太快，雖然這裡是已經預先載入了，不會增加server負擔 ，但能增加每頁切換的速度
+      // 等待幾秒不要一次抓太快，雖然這裡是已經預先載入了，不會增加server負擔 ，但能增加每頁切換的速度
       // 如果沒有上面的 scroll ，則需要另外等待秒數讓
-      // await page.waitForTimeout(300)
+      // await page.waitForTimeout(5000) or await new Promise(r => setTimeout(r, 5000))
       try {
-        // 因為 cna 第一個分類 "疫情" 的 lazy load 按鈕跟其他頁做的不一樣，所以用 if 分開
+        // 因為 cna 分類 "疫情" 的 lazy load 按鈕跟其他頁做的不一樣，所以用 if 分開
         if (element.name === '疫情') {
           await page.click('a.myCMoreNews.moreContent')
         } else {
@@ -84,8 +88,8 @@ async function getCategorySubPost (data: Array<Category>, page: Page) {
         await getPostContent(body, element.name)
 
         // 第二種，使用 puppeteer 的 eval 方法，進入 browser 內用 vanilla 的 dom 操作
-        const list = await evaluateTest(page)
-        console.log('getCategorySubPost ~ list', list)
+        // const list = await evaluateTest(page)
+        // console.log('getCategorySubPost ~ list', list)
 
         // 停止 while loop
         end = false
@@ -123,6 +127,11 @@ async function getPostContent (body: any, categoryName: string) {
   saveToFile(postContent, categoryName)
 }
 
+/********************************************************************************
+*
+          helper
+*
+*********************************************************************************/
 function saveToFile (data: Array<Object>, fileName: string) {
   const fs = require('fs')
   const content = JSON.stringify(data) //轉換成json格式
@@ -153,6 +162,11 @@ async function autoScroll (page: any) {
   })
 }
 
+/********************************************************************************
+*
+          以下是測試寫法，不用在主程式中
+*
+*********************************************************************************/
 async function evaluateTest (page: Page) {
   return page.evaluate(() => {
     let _array: Object[] = []
