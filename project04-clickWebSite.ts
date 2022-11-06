@@ -1,5 +1,8 @@
 import * as puppeteer from 'puppeteer'
 import * as dotenv from 'dotenv'
+import axios from 'axios'
+import FormData from 'form-data'
+
 dotenv.config()
 
 /********************************************************************************
@@ -45,15 +48,22 @@ const webSiteURL = 'https://www.star-clicks.com/default'
 
   // 等待登入頁面並輸入登入資訊
   await delay(5000)
-  await page.waitForSelector('[id=Password]') 
+  await page.waitForSelector('[id=Password]')
 
   await page.evaluate(() => {
     ;(document.querySelector('[id=Email]')! as HTMLInputElement).value =
-    'yongsin0129@gmail.com'
+      'yongsin0129@gmail.com'
   })
   await page.type('input[id=Password]', pwd) // 因為開 window 後，吃不到 .env 的 pwd , 所以改用 page.type 來打
 
-  await delay(5000) // 等待五秒時間，讓人手動輸入數字辨識
+  // 抓取 captcha img 的 URL 呼叫 API 辨識數字後自動輸入
+  const captchaURL = await page.evaluate(() => {
+    return (document.querySelector('.imageclass')! as HTMLImageElement).src
+  })
+  const captchaValue: string = await getCaptchaValue(captchaURL)
+  await page.type('input[maxlength="4"]', captchaValue)
+
+  // await delay(5000) // 等待五秒時間，讓人手動輸入數字辨識
   await page.click('input[id=Button1_input]') // 點擊登入
   console.log('成功點擊登入')
 
@@ -89,3 +99,21 @@ function delay (time: number) {
 // console.log(new Date())
 // await delay(5000)
 // console.log(new Date())
+
+async function getCaptchaValue (captchaURL: string): Promise<string> {
+  const bodyFormData = new FormData()
+  bodyFormData.append('image_url', captchaURL)
+
+  const response = await axios.post(
+    'http://172.105.214.31:8000/get_captcha',
+    bodyFormData,
+    {
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json'
+      }
+    }
+  )
+  const captchaValue: string = response.data
+  return captchaValue
+}
